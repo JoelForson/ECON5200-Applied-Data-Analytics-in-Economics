@@ -49,10 +49,10 @@ Through this approach, I'm developing the ability to:
 ```
 ECON-5200-Portfolio/
 │
+└── README.md          # You are here!
 ├── labs/              # Weekly lab assignments
 ├── projects/          # Course projects and case studies
-├── notebooks/         # Jupyter/Colab notebooks with analysis
-└── README.md          # You are here!
+
 ```
 
 ---
