@@ -51,6 +51,7 @@ ECON-5200-Portfolio/
 │
 └── README.md          # You are here!
 ├── labs/              # Weekly lab assignments
+├── notes/             # Coding samples from class notes
 ├── projects/          # Course projects and case studies
 
 ```
