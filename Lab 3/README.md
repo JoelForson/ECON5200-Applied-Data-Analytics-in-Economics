@@ -6,6 +6,9 @@ I created an economic analysis pipeline that connects to the World Bank API to i
 
 My goal wasn't just to show Ghana's GDP going up (spoiler: it does). It was to figure out what that *actually means* by comparing Ghana to similar countries and the world average. A line trending upward looks amazing—until you realize everyone else's line is going up even faster.
 
+The end result was this econcomic dashboard showcasing the development of Ghana's economy
+<img width="799" height="440" alt="Screenshot 2026-01-23 at 4 37 56 PM" src="https://github.com/user-attachments/assets/5530e42e-8b2e-4c10-8660-cdbd6232a43e" />
+
 This project taught me to always ask: "Compared to what?"
 
 ---
