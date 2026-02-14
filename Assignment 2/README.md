@@ -74,6 +74,8 @@ I simulated 10,000 token launches using a Pareto distribution (α=1.05) and spli
 
 This is the same structural illusion that crypto influencers exploit: showcasing winners while 98.6% of tokens quietly die. Analyzing only listed coins is survivorship bias in its purest form.
 
+<img width="1470" height="680" alt="image" src="https://github.com/user-attachments/assets/06adaf44-da10-45d9-906a-81c5ddd2ca93" />
+
 **Takeaway:** Any dataset that filters on the outcome variable (survival, success, listing) will overestimate performance. Always ask: "where are the dead tokens?"
 
 ---
