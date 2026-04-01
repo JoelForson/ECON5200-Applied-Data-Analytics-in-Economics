@@ -98,6 +98,7 @@ depending on where you sit relative to the floor. The policy does not hurt every
 and it does not help everyone equally. The data tells you exactly where the effects
 concentrate, and that information should drive every decision made on both sides of
 the debate.
+
 ---
 
 ## Data Source
