@@ -1,0 +1,29 @@
+# ============================================================
+# requirements.txt
+# Card & Krueger (1994) Replication & Extension
+# ECON 5200 — Applied Data Analytics in Economics
+# ============================================================
+
+# Core data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Statistical modeling & econometrics
+statsmodels>=0.14.0
+
+# Machine learning & model selection
+scikit-learn>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Notebook environment
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Data serialization (parquet export)
+pyarrow>=12.0.0
+
+# SAS file reading (public.dat ingestion)
+pyreadstat>=1.2.0
