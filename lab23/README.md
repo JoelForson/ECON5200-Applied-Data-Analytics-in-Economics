@@ -1,28 +1,71 @@
-## FedSpeak 2.0 — NLP Pipeline for Central Bank Communications
+# FedSpeak 2.0 — NLP Pipeline for Central Bank Communications
 
-**Objective:** Diagnose and reconstruct a production-grade NLP pipeline for Federal Reserve meeting minutes, benchmarking bag-of-words and contextual embedding representations against a historically-grounded monetary policy classification task.
+![Stack](https://img.shields.io/badge/stack-sklearn%20·%20nltk%20·%20sentence--transformers-blue)
+![Domain](https://img.shields.io/badge/domain-Monetary%20Policy%20NLP-green)
+![Module](https://img.shields.io/badge/module-fomc__sentiment.py-lightgrey)
 
-### Methodology
+## Objective
 
-- **Pipeline audit:** Identified three systematic errors in an existing FOMC text pipeline — a whitespace tokenizer that left punctuation attached to tokens, the Harvard General Inquirer (GI) sentiment dictionary which mislabels neutral financial terms ("capital," "liability," "tax") as negative, and a TF-IDF configuration with no document-frequency filtering, producing a vocabulary dominated by background terms with zero discriminating power.
-
-- **Preprocessing reconstruction:** Replaced `str.split()` with `nltk.word_tokenize()` combined with regex stripping of non-alphabetic characters, followed by stop-word removal and WordNet lemmatization. Verified correctness by asserting zero non-alpha tokens across the full corpus.
-
-- **Domain-appropriate sentiment scoring:** Replaced the GI dictionary with the Loughran-McDonald (LM) financial lexicon (Loughran & McDonald, 2011, *Journal of Finance*), which was constructed specifically for SEC filings and central bank communications. Scored each document on net sentiment, negativity, and uncertainty dimensions. LM false-positive rate on financial terminology dropped below 10% vs. the GI baseline.
-
-- **TF-IDF vectorization:** Rebuilt the feature matrix with `min_df=5`, `max_df=0.85`, `ngram_range=(1,2)`, and sublinear TF scaling — filtering rare OCR artifacts and ubiquitous background terms while capturing domain-critical bigrams such as "interest rate," "federal fund," and "price stability."
-
-- **Contextual embeddings:** Encoded all FOMC documents using `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense vectors), truncating each document to the first 2,000 characters to respect the model's context window.
-
-- **Clustering comparison:** Applied K-Means (K=3) to both representations, reducing TF-IDF to 50 dimensions via Truncated SVD prior to clustering. Evaluated separation quality with silhouette scores and visualized cluster structure via PCA projection.
-
-- **Predictive evaluation:** Trained logistic regression classifiers on both feature sets to predict whether the Fed was in a tightening cycle (2004–06, 2015–18, 2022–23), using `TimeSeriesSplit` (5 folds) to respect the sequential structure of the data. Reported AUC-ROC per fold with mean ± standard deviation.
-
-- **Reusable module:** Packaged the corrected pipeline as `fomc_sentiment.py`, exposing three public functions — `preprocess_fomc()`, `compute_lm_sentiment()`, and `build_tfidf_matrix()` — with full docstrings documenting parameter rationale and design decisions.
-
-### Key Findings
-
-Sentence-transformer embeddings produced tighter cluster separation (higher silhouette score) than TF-IDF, reflecting their ability to encode syntactic context and word order rather than treating documents as unordered token bags. On the monetary policy classification task, [TF-IDF / Embeddings] achieved a mean AUC of [VALUE] ± [STD] across valid time-series folds, outperforming the alternative representation. The LM dictionary corrected a systematic negativity bias introduced by the GI lexicon — particularly relevant for FOMC minutes, where terms like "capital requirements" and "debt ceiling" carry no inherently negative connotation in the Federal Reserve's policy language.
+This project constructs and validates a production-grade NLP pipeline for quantifying hawkish/dovish sentiment in Federal Open Market Committee (FOMC) meeting minutes, diagnosing and correcting three systematic failures in a predecessor pipeline before benchmarking TF-IDF and sentence-embedding approaches against observed Fed rate decisions.
 
 ---
-*ECON 5200: Causal Machine Learning & Applied Analytics | Lab 23*
+
+## Methodology
+
+1. **Pipeline diagnostics & repair**
+   Identified three critical defects: a whitespace-only tokenizer replaced with `nltk.word_tokenize`; the Harvard General Inquirer sentiment lexicon replaced with the domain-appropriate Loughran-McDonald financial dictionary; and misconfigured TF-IDF `min_df`/`max_df` thresholds corrected for sparse financial corpora.
+
+2. **Sentiment scoring with Loughran-McDonald**
+   Computed document-level net sentiment scores using the LM financial lexicon — purpose-built for regulatory and central bank language — capturing directional tone missed by general-purpose dictionaries.
+
+3. **Dual-representation feature engineering**
+   Encoded FOMC documents under two paradigms: sparse TF-IDF vectors (50-dim SVD reduction) and dense semantic embeddings via `all-MiniLM-L6-v2` (sentence-transformers), enabling direct comparison of lexical versus contextual representations.
+
+4. **Clustering & predictive benchmarking**
+   Applied K-Means clustering under both representations and evaluated predictive power against realized Fed rate decisions using 5-fold time-series cross-validation with AUC-ROC as the primary discrimination metric.
+
+5. **Reusable module packaging**
+   Encapsulated validated logic in `fomc_sentiment.py` exposing three public functions: `preprocess_fomc()`, `compute_lm_sentiment()`, and `build_tfidf_matrix()`.
+
+---
+
+## Key Findings
+
+### Primary result — TF-IDF wins
+
+TF-IDF (50-dim SVD) achieved a mean AUC of **0.797 ± 0.227** across valid time-series folds, outperforming sentence-transformer embeddings (AUC 0.714 ± 0.213) for predicting Federal Reserve tightening decisions — a non-trivial result suggesting that term-frequency patterns in FOMC language carry more discriminative signal than contextual semantics for this classification task.
+
+### Lexicon sensitivity
+
+Switching from Harvard GI to Loughran-McDonald produced substantially different document-level sentiment scores, confirming that domain-matched lexicons are a methodological requirement — not a stylistic preference — for central bank text analysis.
+
+### High variance caveat
+
+Both approaches exhibited high fold-level variance (±0.22–0.23 AUC), with early folds skipped due to single-class splits — consistent with the severe class imbalance in the dataset (72 tightening vs. 168 easing/hold meetings). Mean AUC figures should be interpreted as directional rather than definitive.
+
+### Representation tradeoffs
+
+TF-IDF and sentence-embedding clustering produced meaningfully distinct groupings of FOMC minutes — suggesting that lexical frequency and contextual semantics capture complementary dimensions of monetary policy communication that may warrant ensemble treatment in applied research.
+
+---
+
+## AUC-ROC Summary
+
+| Representation | Mean AUC | Std Dev | Valid Folds |
+|---|---|---|---|
+| TF-IDF (50-dim SVD) | 0.797 | ±0.227 | 3 of 5 |
+| Sentence-transformer embeddings | 0.714 | ±0.213 | 3 of 5 |
+
+> **Note:** Folds 1 and 2 were skipped for both models due to single-class splits, a consequence of the chronological ordering of FOMC tightening cycles in the dataset.
+
+---
+
+## Module Reference
+
+**`fomc_sentiment.py`**
+
+| Function | Description |
+|---|---|
+| `preprocess_fomc(text)` | Tokenizes and cleans FOMC document text using `nltk.word_tokenize` |
+| `compute_lm_sentiment(tokens)` | Scores net sentiment using the Loughran-McDonald financial lexicon |
+| `build_tfidf_matrix(corpus)` | Constructs a TF-IDF matrix with corrected `min_df`/`max_df` parameters |
